@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang = "en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset = "UTF-8">
+  <meta name    = "viewport" content = "width=device-width, initial-scale=1.0">
   <title>Dropdown</title>
 
   <style>
@@ -11,24 +11,24 @@
     *::before,
     *::after {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+      margin    : 0;
+      padding   : 0;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family     : -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: #f4f5f7;
-      padding: 40px;
-      color: #1a1a2e;
+      padding         : 40px;
+      color           : #1a1a2e;
     }
 
     .oj-dropdown {
       position: relative;
-      display: inline-block;
+      display : inline-block;
     }
 
     .oj-dropdown-content {
-      display: none;
+      display : none;
       position: absolute;
     }
 
@@ -41,9 +41,9 @@
 
 <body>
 
-  <div class="oj-dropdown" data-single>
-    <button class="oj-dropdown-button">🌐 <span>English</span></button>
-    <div class="oj-dropdown-content">
+  <div    class = "oj-dropdown" data-single>
+  <button class = "oj-dropdown-button">🌐 <span>English</span></button>
+  <div    class = "oj-dropdown-content">
       <button data-selected>English</button>
       <button>Nederlands</button>
       <button>Deutsch</button>
@@ -61,11 +61,16 @@
       constructor(rootElement) {
 
         this.rootElement = rootElement;
-        this.isOpen = false;
+        this.isOpen      = false;
 
-        this.rootElement.querySelector('.oj-dropdown-button').addEventListener('click', () => this.toggle());
+        this.button           = this.rootElement.querySelector('.oj-dropdown-button');
+        this.label            = this.button.querySelector('span');
+        this.optionsContainer = this.rootElement.querySelector('.oj-dropdown-content');
+        this.optionButtons    = Array.from(this.optionsContainer.querySelectorAll('button'));
 
-        this.rootElement.querySelectorAll('.oj-dropdown-content button').forEach((optionButton, index) => {
+        this.button.addEventListener('click', () => this.toggle());
+
+        this.optionButtons.forEach((optionButton, index) => {
           optionButton.addEventListener('click', () => this.selectOption(index));
         });
 
@@ -90,25 +95,26 @@
       }
 
       toggle() {
+
         this.isOpen ? this.close() : this.open();
+
       }
 
       selectOption(index) {
 
-        const optionButtons = this.rootElement.querySelectorAll('.oj-dropdown-content button');
-        const selectedOption = optionButtons[index];
+        const selectedOption = this.optionButtons[index];
 
         if (selectedOption) {
-          this.rootElement.querySelector('.oj-dropdown-button span').textContent = selectedOption.textContent;
+          this.label.textContent = selectedOption.textContent;
 
-
-          optionButtons.forEach(btn => btn.removeAttribute('data-selected'));
+          this.optionButtons.forEach(btn => btn.removeAttribute('data-selected'));
           selectedOption.setAttribute('data-selected', '');
 
           this.close();
         }
 
       }
+
     }
 
     for (const el of document.querySelectorAll(".oj-dropdown"))
