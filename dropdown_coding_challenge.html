@@ -70,17 +70,19 @@
         this.initializeOptions();
         this.bindEventListeners();
 
+        this.render();
+
       }
 
       cacheDomElements() {
 
         this.dom = {
-          rootElement           : this.rootElement,
-          toggleButton          : this.rootElement.querySelector('.oj-dropdown-button'),
-          buttonLabel           : this.rootElement.querySelector('.oj-dropdown-button span'),
-          dropdownContent       : this.rootElement.querySelector('.oj-dropdown-content'),
-          
-          dropdownOptionElements: Array.from( this.rootElement.querySelectorAll('.oj-dropdown-content button') )
+          rootElement    : this.rootElement,
+          toggleButton   : this.rootElement.querySelector('.oj-dropdown-button'),
+          buttonLabel    : this.rootElement.querySelector('.oj-dropdown-button span'),
+          dropdownContent: this.rootElement.querySelector('.oj-dropdown-content'),
+
+          dropdownOptionElements: Array.from(this.rootElement.querySelectorAll('.oj-dropdown-content button'))
         };
 
       }
@@ -117,11 +119,18 @@
       }
 
       onToggleButtonClick(event) {
+
         this.state.isOpen ? this.close() : this.open();
+        this.render();
+
       }
 
       onDropdownOptionClick(event, index) {
+
         this.selectOption(index);
+        this.close();
+        this.render();
+        
       }
 
       open() {
@@ -147,18 +156,37 @@
         const option = this.options[index];
 
         if (option) {
+
           this.state.selectedOptionIndex = index;
 
           this.options.forEach(opt => opt.selected = false);
           option.selected = true;
 
-          this.dom.buttonLabel.textContent = option.label;
-
-          this.dom.dropdownOptionElements.forEach(btn => btn.removeAttribute('data-selected'));
-          option.optionElement.setAttribute('data-selected', '');
-
-          this.close();
         }
+
+      }
+
+      render() {
+
+        if (this.state.isOpen) {
+          this.dom.rootElement.classList.add('open');
+        } else {
+          this.dom.rootElement.classList.remove('open');
+        }
+
+        const selectedOption = this.options[this.state.selectedOptionIndex];
+
+        if (selectedOption) {
+          this.dom.buttonLabel.textContent = selectedOption.label;
+        }
+
+        this.options.forEach(opt => {
+          if (opt.selected) {
+            opt.optionElement.setAttribute('data-selected', '');
+          } else {
+            opt.optionElement.removeAttribute('data-selected');
+          }
+        });
 
       }
 
