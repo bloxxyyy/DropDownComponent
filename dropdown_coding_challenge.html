@@ -43,18 +43,18 @@
 
 <body>
 
-  <div class = "oj-dropdown" data-single>
-    <button class = "oj-dropdown-button">🌐 <span>English</span></button>
-    
-    <div class = "oj-dropdown-content">
-        <button data-selected>English</button>
-        <button>Nederlands</button>
-        <button>Deutsch</button>
-        <button>Français</button>
-        <button>Español</button>
-        <button>Português</button>
-        <button>日本語</button>
-      </div>
+  <div class="oj-dropdown" data-single>
+    <button class="oj-dropdown-button">🌐 <span>English</span></button>
+
+    <div class="oj-dropdown-content">
+      <button data-selected>English</button>
+      <button>Nederlands</button>
+      <button>Deutsch</button>
+      <button>Français</button>
+      <button>Español</button>
+      <button>Português</button>
+      <button>日本語</button>
+    </div>
   </div>
 
   <script>
@@ -64,8 +64,10 @@
       constructor(rootElement) {
 
         this.rootElement = rootElement;
+
         this.cacheDomElements();
-        this.isOpen = false;
+        this.initializeState();
+        this.initializeOptions();
         this.bindEventListeners();
 
       }
@@ -83,20 +85,49 @@
 
       }
 
+      initializeState() {
+
+        this.state = {
+          isOpen: false,
+          selectedOptionIndex: this.dom.dropdownOptionElements.findIndex(button => button.hasAttribute('data-selected'))
+        };
+
+      }
+
+      initializeOptions() {
+
+        this.options = this.dom.dropdownOptionElements.map((button, index) => ({
+          optionElement: button,
+          label        : button.textContent,
+          value        : button.dataset.value || button.textContent,
+          selected     : button.hasAttribute('data-selected'),
+          index
+        }));
+
+      }
+
       bindEventListeners() {
 
-        this.dom.toggleButton.addEventListener('click', () => this.toggle());
+        this.dom.toggleButton.addEventListener('click', (event) => this.onToggleButtonClick(event));
 
-        this.dom.dropdownOptionElements.forEach((optionButton, index) => {
-          optionButton.addEventListener('click', () => this.selectOption(index));
+        this.options.forEach((option) => {
+          option.optionElement.addEventListener('click', (event) => this.onDropdownOptionClick(event, option.index));
         });
 
       }
 
+      onToggleButtonClick(event) {
+        this.state.isOpen ? this.close() : this.open();
+      }
+
+      onDropdownOptionClick(event, index) {
+        this.selectOption(index);
+      }
+
       open() {
 
-        if (!this.isOpen) {
-          this.isOpen = true;
+        if (!this.state.isOpen) {
+          this.state.isOpen = true;
           this.dom.rootElement.classList.add('open');
         }
 
@@ -104,28 +135,27 @@
 
       close() {
 
-        if (this.isOpen) {
-          this.isOpen = false;
+        if (this.state.isOpen) {
+          this.state.isOpen = false;
           this.dom.rootElement.classList.remove('open');
         }
 
       }
 
-      toggle() {
-
-        this.isOpen ? this.close() : this.open();
-
-      }
-
       selectOption(index) {
 
-        const selectedOption = this.dom.dropdownOptionElements[index];
+        const option = this.options[index];
 
-        if (selectedOption) {
-          this.dom.buttonLabel.textContent = selectedOption.textContent;
+        if (option) {
+          this.state.selectedOptionIndex = index;
+
+          this.options.forEach(opt => opt.selected = false);
+          option.selected = true;
+
+          this.dom.buttonLabel.textContent = option.label;
 
           this.dom.dropdownOptionElements.forEach(btn => btn.removeAttribute('data-selected'));
-          selectedOption.setAttribute('data-selected', '');
+          option.optionElement.setAttribute('data-selected', '');
 
           this.close();
         }
