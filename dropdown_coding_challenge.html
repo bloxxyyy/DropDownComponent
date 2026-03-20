@@ -1,123 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dropdown</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropdown</title>
 
-    <style>
-      
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background-color: #f4f5f7;
-        padding: 40px;
-        color: #1a1a2e;
-      }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f4f5f7;
+      padding: 40px;
+      color: #1a1a2e;
+    }
 
-      .oj-dropdown {
-        position: relative;
-        display: inline-block;
-      }
+    .oj-dropdown {
+      position: relative;
+      display: inline-block;
+    }
 
-      .oj-dropdown-content {
-        display: none;
-        position: absolute;
-      }
+    .oj-dropdown-content {
+      display: none;
+      position: absolute;
+    }
 
-      .oj-dropdown.open .oj-dropdown-content {
-        display: block;
-      }
+    .oj-dropdown.open .oj-dropdown-content {
+      display: block;
+    }
+  </style>
 
-    </style>
-    
-  </head>
+</head>
 
-  <body>
+<body>
 
-    <div class="oj-dropdown" data-single>
-      <button class="oj-dropdown-button">🌐 <span>English</span></button>
-      <div class="oj-dropdown-content">
-        <button data-selected>English</button>
-        <button>Nederlands</button>
-        <button>Deutsch</button>
-        <button>Français</button>
-        <button>Español</button>
-        <button>Português</button>
-        <button>日本語</button>
-      </div>
+  <div class="oj-dropdown" data-single>
+    <button class="oj-dropdown-button">🌐 <span>English</span></button>
+    <div class="oj-dropdown-content">
+      <button data-selected>English</button>
+      <button>Nederlands</button>
+      <button>Deutsch</button>
+      <button>Français</button>
+      <button>Español</button>
+      <button>Português</button>
+      <button>日本語</button>
     </div>
+  </div>
 
-    <script>
+  <script>
 
-      class OJDropdown {
+    class OJDropdown {
 
-        constructor(rootElement) {
+      constructor(rootElement) {
 
-          this.rootElement = rootElement;
-          this.isOpen = false;
+        this.rootElement = rootElement;
+        this.isOpen = false;
 
-          this.rootElement.querySelector('.oj-dropdown-button').addEventListener('click', () => this.toggle());
+        this.rootElement.querySelector('.oj-dropdown-button').addEventListener('click', () => this.toggle());
 
-          this.rootElement.querySelectorAll('.oj-dropdown-content button').forEach((optionButton, index) => {
-            optionButton.addEventListener('click', () => this.selectOption(index));
-          });
+        this.rootElement.querySelectorAll('.oj-dropdown-content button').forEach((optionButton, index) => {
+          optionButton.addEventListener('click', () => this.selectOption(index));
+        });
 
-        }
-
-        open() {
-
-          if (!this.isOpen) {
-            this.isOpen = true;
-            this.rootElement.classList.add('open');
-          }
-
-        }
-
-        close() {
-
-          if (this.isOpen) {
-            this.isOpen = false;
-            this.rootElement.classList.remove('open');
-          }
-
-        }
-
-        toggle() {
-          this.isOpen ? this.close() : this.open();
-        }
-
-        selectOption(index) {
-
-          const optionButtons = this.rootElement.querySelectorAll('.oj-dropdown-content button');
-          const selectedOption = optionButtons[index];
-
-          if (selectedOption) {
-            this.rootElement.querySelector('.oj-dropdown-button span').textContent = selectedOption.textContent;
-
-
-            optionButtons.forEach(btn => btn.removeAttribute('data-selected'));
-            selectedOption.setAttribute('data-selected', '');
-
-            this.close();
-          }
-
-        }
       }
 
-      for (const el of document.querySelectorAll(".oj-dropdown"))
-        new OJDropdown(el)
+      open() {
 
-    </script>
+        if (!this.isOpen) {
+          this.isOpen = true;
+          this.rootElement.classList.add('open');
+        }
 
-  </body>
+      }
+
+      close() {
+
+        if (this.isOpen) {
+          this.isOpen = false;
+          this.rootElement.classList.remove('open');
+        }
+
+      }
+
+      toggle() {
+        this.isOpen ? this.close() : this.open();
+      }
+
+      selectOption(index) {
+
+        const optionButtons = this.rootElement.querySelectorAll('.oj-dropdown-content button');
+        const selectedOption = optionButtons[index];
+
+        if (selectedOption) {
+          this.rootElement.querySelector('.oj-dropdown-button span').textContent = selectedOption.textContent;
+
+
+          optionButtons.forEach(btn => btn.removeAttribute('data-selected'));
+          selectedOption.setAttribute('data-selected', '');
+
+          this.close();
+        }
+
+      }
+    }
+
+    for (const el of document.querySelectorAll(".oj-dropdown"))
+      new OJDropdown(el)
+
+  </script>
+
+</body>
 
 </html>
