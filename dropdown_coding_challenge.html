@@ -90,8 +90,9 @@
       initializeState() {
 
         this.state = {
-          isOpen: false,
-          selectedOptionIndex: this.dom.dropdownOptionElements.findIndex(button => button.hasAttribute('data-selected'))
+          isOpen             : false,
+          selectedOptionIndex: this.dom.dropdownOptionElements.findIndex(button => button.hasAttribute('data-selected')),
+          focusedOptionIndex : -1
         };
 
       }
@@ -111,9 +112,11 @@
       bindEventListeners() {
 
         this.dom.toggleButton.addEventListener('click', (event) => this.onToggleButtonClick(event));
+        this.dom.toggleButton.addEventListener('keydown', (event) => this.onToggleButtonKeyDown(event));
 
         this.options.forEach((option) => {
           option.optionElement.addEventListener('click', (event) => this.onDropdownOptionClick(event, option.index));
+          option.optionElement.addEventListener('keydown', (event) => this.onOptionKeyDown(event, option.index));
         });
 
       }
@@ -133,6 +136,79 @@
         
       }
 
+      onToggleButtonKeyDown(event) {
+
+        if (event.key === 'ArrowDown') {
+
+          event.preventDefault();
+
+          this.open();
+          this.state.focusedOptionIndex = this.state.selectedOptionIndex >= 0 ? this.state.selectedOptionIndex : 0;
+
+          this.render();
+          this.focusOption(this.state.focusedOptionIndex);
+
+        }
+
+      }
+
+      focusOption(index) {
+
+        const option = this.options[index];
+
+        if (option) {
+          option.optionElement.focus();
+        }
+
+      }
+
+      onOptionKeyDown(event, index) {
+
+        if (event.key === 'ArrowDown') {
+
+          event.preventDefault();
+
+          const nextIndex = (index + 1) % this.options.length;
+          this.state.focusedOptionIndex = nextIndex;
+
+          this.focusOption(nextIndex);
+
+        }
+
+        if (event.key === 'ArrowUp') {
+
+          event.preventDefault();
+
+          const prevIndex = (index - 1 + this.options.length) % this.options.length;
+          this.state.focusedOptionIndex = prevIndex;
+
+          this.focusOption(prevIndex);
+
+        }
+
+        if (event.key === 'Enter') {
+
+          event.preventDefault();
+
+          this.selectOption(index);
+          this.close();
+          this.render();
+
+          this.dom.toggleButton.focus();
+
+        }
+
+        if (event.key === 'Escape') {
+
+          this.close();
+          this.render();
+
+          this.dom.toggleButton.focus();
+
+        }
+
+      }
+
       open() {
 
         if (!this.state.isOpen) {
@@ -147,6 +223,7 @@
         if (this.state.isOpen) {
           this.state.isOpen = false;
           this.dom.rootElement.classList.remove('open');
+          this.state.focusedOptionIndex = -1;
         }
 
       }
