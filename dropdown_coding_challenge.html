@@ -134,12 +134,28 @@
           option.optionElement.addEventListener('keydown', (event) => this.onOptionKeyDown(event, option.index));
         });
 
+        document.addEventListener('click', (event) => {
+          if (!this.dom.rootElement.contains(event.target) && this.state.isOpen) {
+            this.close();
+            this.render();
+          }
+        });
+
       }
 
       onToggleButtonClick(event) {
 
-        this.state.isOpen ? this.close() : this.open();
-        this.render();
+        if (this.state.isOpen) {
+          this.close();
+          this.render();
+        } else {
+          this.open();
+          this.state.focusedOptionIndex = 
+            this.state.selectedOptionIndex >= 0 ? this.state.selectedOptionIndex : 0;
+
+          this.render();
+          this.focusOption(this.state.focusedOptionIndex);
+        }
 
       }
 
@@ -219,6 +235,13 @@
           this.render();
 
           this.dom.toggleButton.focus();
+
+        }
+
+        if (event.key === 'Tab') {
+
+          this.close();
+          this.render();
 
         }
 
