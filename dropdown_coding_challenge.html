@@ -85,6 +85,15 @@
           dropdownOptionElements: Array.from(this.rootElement.querySelectorAll('.oj-dropdown-content button'))
         };
 
+        this.dom.dropdownContent.id = this.dom.dropdownContent.id || this.generateId();
+
+        this.dom.toggleButton.setAttribute('aria-haspopup', 'listbox');
+        this.dom.dropdownContent.setAttribute('role', 'listbox');
+
+      }
+
+      generateId(prefix = 'oj-dropdown') {
+        return `${prefix}-${Math.random().toString(36).slice(2)}`;
       }
 
       initializeState() {
@@ -99,13 +108,19 @@
 
       initializeOptions() {
 
-        this.options = this.dom.dropdownOptionElements.map((button, index) => ({
-          optionElement: button,
-          label        : button.textContent,
-          value        : button.dataset.value || button.textContent,
-          selected     : button.hasAttribute('data-selected'),
-          index
-        }));
+        this.options = this.dom.dropdownOptionElements.map((button, index) => {
+
+          button.setAttribute('role', 'option');
+
+          return {
+            optionElement: button,
+            label        : button.textContent,
+            value        : button.dataset.value || button.textContent,
+            selected     : button.hasAttribute('data-selected'),
+            index
+          };
+
+        });
 
       }
 
@@ -213,7 +228,6 @@
 
         if (!this.state.isOpen) {
           this.state.isOpen = true;
-          this.dom.rootElement.classList.add('open');
         }
 
       }
@@ -221,8 +235,7 @@
       close() {
 
         if (this.state.isOpen) {
-          this.state.isOpen = false;
-          this.dom.rootElement.classList.remove('open');
+          this.state.isOpen             = false;
           this.state.focusedOptionIndex = -1;
         }
 
@@ -251,6 +264,9 @@
           this.dom.rootElement.classList.remove('open');
         }
 
+        this.dom.toggleButton.setAttribute('aria-expanded', this.state.isOpen);
+        this.dom.toggleButton.setAttribute('aria-controls', this.dom.dropdownContent.id);
+
         const selectedOption = this.options[this.state.selectedOptionIndex];
 
         if (selectedOption) {
@@ -258,11 +274,15 @@
         }
 
         this.options.forEach(opt => {
+
           if (opt.selected) {
             opt.optionElement.setAttribute('data-selected', '');
           } else {
             opt.optionElement.removeAttribute('data-selected');
           }
+
+          opt.optionElement.setAttribute('aria-selected', opt.selected);
+
         });
 
       }
