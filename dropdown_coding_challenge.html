@@ -43,18 +43,18 @@
 
 <body>
 
-  <div class = "oj-dropdown" data-single>
-    <button class = "oj-dropdown-button">🌐 <span>English</span></button>
-    
-    <div class = "oj-dropdown-content">
-        <button data-selected>English</button>
-        <button>Nederlands</button>
-        <button>Deutsch</button>
-        <button>Français</button>
-        <button>Español</button>
-        <button>Português</button>
-        <button>日本語</button>
-      </div>
+  <div class="oj-dropdown" data-single>
+    <button class="oj-dropdown-button">🌐 <span>English</span></button>
+
+    <div class="oj-dropdown-content">
+      <button data-selected>English</button>
+      <button>Nederlands</button>
+      <button>Deutsch</button>
+      <button>Français</button>
+      <button>Español</button>
+      <button>Português</button>
+      <button>日本語</button>
+    </div>
   </div>
 
   <script>
@@ -64,57 +64,206 @@
       constructor(rootElement) {
 
         this.rootElement = rootElement;
-        this.isOpen      = false;
 
-        this.button           = this.rootElement.querySelector('.oj-dropdown-button');
-        this.label            = this.button.querySelector('span');
-        this.optionsContainer = this.rootElement.querySelector('.oj-dropdown-content');
-        this.optionButtons    = Array.from(this.optionsContainer.querySelectorAll('button'));
+        this.cacheDomElements();
+        this.initializeState();
+        this.initializeOptions();
+        this.bindEventListeners();
 
-        this.button.addEventListener('click', () => this.toggle());
+        this.render();
 
-        this.optionButtons.forEach((optionButton, index) => {
-          optionButton.addEventListener('click', () => this.selectOption(index));
+      }
+
+      cacheDomElements() {
+
+        this.dom = {
+          rootElement    : this.rootElement,
+          toggleButton   : this.rootElement.querySelector('.oj-dropdown-button'),
+          buttonLabel    : this.rootElement.querySelector('.oj-dropdown-button span'),
+          dropdownContent: this.rootElement.querySelector('.oj-dropdown-content'),
+
+          dropdownOptionElements: Array.from(this.rootElement.querySelectorAll('.oj-dropdown-content button'))
+        };
+
+      }
+
+      initializeState() {
+
+        this.state = {
+          isOpen             : false,
+          selectedOptionIndex: this.dom.dropdownOptionElements.findIndex(button => button.hasAttribute('data-selected')),
+          focusedOptionIndex : -1
+        };
+
+      }
+
+      initializeOptions() {
+
+        this.options = this.dom.dropdownOptionElements.map((button, index) => ({
+          optionElement: button,
+          label        : button.textContent,
+          value        : button.dataset.value || button.textContent,
+          selected     : button.hasAttribute('data-selected'),
+          index
+        }));
+
+      }
+
+      bindEventListeners() {
+
+        this.dom.toggleButton.addEventListener('click', (event) => this.onToggleButtonClick(event));
+        this.dom.toggleButton.addEventListener('keydown', (event) => this.onToggleButtonKeyDown(event));
+
+        this.options.forEach((option) => {
+          option.optionElement.addEventListener('click', (event) => this.onDropdownOptionClick(event, option.index));
+          option.optionElement.addEventListener('keydown', (event) => this.onOptionKeyDown(event, option.index));
         });
+
+      }
+
+      onToggleButtonClick(event) {
+
+        this.state.isOpen ? this.close() : this.open();
+        this.render();
+
+      }
+
+      onDropdownOptionClick(event, index) {
+
+        this.selectOption(index);
+        this.close();
+        this.render();
+        
+      }
+
+      onToggleButtonKeyDown(event) {
+
+        if (event.key === 'ArrowDown') {
+
+          event.preventDefault();
+
+          this.open();
+          this.state.focusedOptionIndex = this.state.selectedOptionIndex >= 0 ? this.state.selectedOptionIndex : 0;
+
+          this.render();
+          this.focusOption(this.state.focusedOptionIndex);
+
+        }
+
+      }
+
+      focusOption(index) {
+
+        const option = this.options[index];
+
+        if (option) {
+          option.optionElement.focus();
+        }
+
+      }
+
+      onOptionKeyDown(event, index) {
+
+        if (event.key === 'ArrowDown') {
+
+          event.preventDefault();
+
+          const nextIndex = (index + 1) % this.options.length;
+          this.state.focusedOptionIndex = nextIndex;
+
+          this.focusOption(nextIndex);
+
+        }
+
+        if (event.key === 'ArrowUp') {
+
+          event.preventDefault();
+
+          const prevIndex = (index - 1 + this.options.length) % this.options.length;
+          this.state.focusedOptionIndex = prevIndex;
+
+          this.focusOption(prevIndex);
+
+        }
+
+        if (event.key === 'Enter') {
+
+          event.preventDefault();
+
+          this.selectOption(index);
+          this.close();
+          this.render();
+
+          this.dom.toggleButton.focus();
+
+        }
+
+        if (event.key === 'Escape') {
+
+          this.close();
+          this.render();
+
+          this.dom.toggleButton.focus();
+
+        }
 
       }
 
       open() {
 
-        if (!this.isOpen) {
-          this.isOpen = true;
-          this.rootElement.classList.add('open');
+        if (!this.state.isOpen) {
+          this.state.isOpen = true;
+          this.dom.rootElement.classList.add('open');
         }
 
       }
 
       close() {
 
-        if (this.isOpen) {
-          this.isOpen = false;
-          this.rootElement.classList.remove('open');
+        if (this.state.isOpen) {
+          this.state.isOpen = false;
+          this.dom.rootElement.classList.remove('open');
+          this.state.focusedOptionIndex = -1;
         }
-
-      }
-
-      toggle() {
-
-        this.isOpen ? this.close() : this.open();
 
       }
 
       selectOption(index) {
 
-        const selectedOption = this.optionButtons[index];
+        const option = this.options[index];
+
+        if (option) {
+
+          this.state.selectedOptionIndex = index;
+
+          this.options.forEach(opt => opt.selected = false);
+          option.selected = true;
+
+        }
+
+      }
+
+      render() {
+
+        if (this.state.isOpen) {
+          this.dom.rootElement.classList.add('open');
+        } else {
+          this.dom.rootElement.classList.remove('open');
+        }
+
+        const selectedOption = this.options[this.state.selectedOptionIndex];
 
         if (selectedOption) {
-          this.label.textContent = selectedOption.textContent;
-
-          this.optionButtons.forEach(btn => btn.removeAttribute('data-selected'));
-          selectedOption.setAttribute('data-selected', '');
-
-          this.close();
+          this.dom.buttonLabel.textContent = selectedOption.label;
         }
+
+        this.options.forEach(opt => {
+          if (opt.selected) {
+            opt.optionElement.setAttribute('data-selected', '');
+          } else {
+            opt.optionElement.removeAttribute('data-selected');
+          }
+        });
 
       }
 
