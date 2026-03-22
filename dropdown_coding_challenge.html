@@ -7,46 +7,197 @@
   <title>Dropdown</title>
 
   <style>
+    :root {
 
-    *,
-    *::before,
-    *::after {
+      --dropdown-min-width        : 9rem;
+      --dropdown-content-min-width: calc(var(--dropdown-min-width) + 2rem);
+      --dropdown-button-padding   : 0.5rem 0.75rem;
+      --dropdown-option-padding   : 0.5rem 0.75rem;
+      --dropdown-option-margin    : 0.125rem 0;
+      --dropdown-border-radius    : 0.375rem;
+      --option-selected-radius    : 0.25rem;
+      --dropdown-border           : 1px solid #d1d5db;
+      --dropdown-bg               : #ffffff;
+      --dropdown-content-border   : 1px solid #e5e7eb;
+      --dropdown-content-shadow   : 0 0.625rem 1.25rem rgba(0, 0, 0, 0.08);
+      --option-hover-bg           : #f3f4f6;
+      --option-selected-bg        : #eef2ff;
+      --option-active-scale       : 0.97;
+      --keyboard-focus-border     : 2px solid #000;
+      --keyboard-focus-radius     : 0.25rem;
+      --keyboard-focus-bg         : #f9fafb;
+      --arrow-rotation-time       : 0.2s;
+      --arrow-font-size           : 1.5rem;
+      --dropdown-bounce-time      : 0.25s;
+      --dropdown-open-scale-start : 0.8;
+      --dropdown-open-scale-bounce: 1.05;
+      --dropdown-open-scale-end   : 1;
+
+    }
+
+    *, *::before, *::after {
+
       box-sizing: border-box;
       margin    : 0;
       padding   : 0;
+
     }
 
     body {
-      font-family     : -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f4f5f7;
-      padding         : 40px;
-      color           : #1a1a2e;
+
+      font-family     : var(--font-family);
+      background-color: var(--body-bg-color);
+      padding         : 2.5rem;
+      color           : var(--text-color);
+
     }
 
     .oj-dropdown {
-      position: relative;
-      display : inline-block;
+
+      position : relative;
+      display  : inline-block;
+      min-width: var(--dropdown-min-width);
+
+    }
+
+    .oj-dropdown-button {
+
+      width           : 100%;
+      padding         : var(--dropdown-button-padding);
+      border          : var(--dropdown-border);
+      border-radius   : var(--dropdown-border-radius);
+      background-color: var(--dropdown-bg);
+      cursor          : pointer;
+      display         : flex;
+      align-items     : center;
+      justify-content : space-between;
+      font-size       : 0.875rem;
+      outline         : none;
+
+    }
+
+    .oj-dropdown-button:focus-visible {
+      outline: auto;
+    }
+
+    .oj-dropdown-button:hover {
+      background-color: var(--option-hover-bg);
+    }
+
+    .oj-dropdown-arrow {
+
+      font-size : var(--arrow-font-size);
+      display   : inline-block;
+      transition: transform var(--arrow-rotation-time) ease;
+
+    }
+
+    .oj-dropdown.open .oj-dropdown-arrow {
+      transform: scaleY(-1);
     }
 
     .oj-dropdown-content {
-      display : none;
-      position: absolute;
+
+      position        : absolute;
+      top             : calc(100% + 0.375rem);
+      left            : 0;
+      min-width       : var(--dropdown-content-min-width);
+      background-color: var(--dropdown-bg);
+      border          : var(--dropdown-content-border);
+      border-radius   : var(--dropdown-border-radius);
+      box-shadow      : var(--dropdown-content-shadow);
+      padding         : var(--dropdown-option-padding);
+      z-index         : 10;
+      opacity         : 0;
+      transform       : scaleY(var(--dropdown-open-scale-start));
+      transform-origin: top;
+      pointer-events  : none;
+      transition      : opacity 0.15s ease, transform 0.15s ease;
+
     }
 
     .oj-dropdown.open .oj-dropdown-content {
-      display: block;
+
+      opacity       : 1;
+      transform     : scaleY(var(--dropdown-open-scale-end));
+      pointer-events: auto;
+      animation     : dropdown-bounce var(--dropdown-bounce-time) ease;
+
     }
 
-  </style>
+    @keyframes dropdown-bounce {
 
+      0% {
+        transform: scaleY(var(--dropdown-open-scale-start));
+      }
+
+      60% {
+        transform: scaleY(var(--dropdown-open-scale-bounce));
+      }
+
+      100% {
+        transform: scaleY(var(--dropdown-open-scale-end));
+      }
+
+    }
+
+    .oj-dropdown-content button {
+
+      width     : 100%;
+      padding   : var(--dropdown-option-padding);
+      margin    : var(--dropdown-option-margin);
+      border    : none;
+      background: none;
+      text-align: left;
+      cursor    : pointer;
+      font-size : 0.875rem;
+      box-sizing: border-box;
+
+    }
+
+    .oj-dropdown-content button:hover {
+      background-color: var(--option-hover-bg);
+    }
+
+    .oj-dropdown-content button:active {
+      transform: scale(var(--option-active-scale));
+    }
+
+    .oj-dropdown-content button[data-selected] {
+
+      font-weight     : 600;
+      background-color: var(--option-selected-bg);
+      border-radius   : var(--option-selected-radius);
+
+    }
+
+    .oj-dropdown-content button.oj-keyboard-focused {
+
+      border          : var(--keyboard-focus-border);
+      border-radius   : var(--keyboard-focus-radius);
+      background-color: var(--keyboard-focus-bg);
+      margin          : -2px;
+
+    }
+
+    .oj-dropdown-content button:focus {
+
+      outline: none;
+
+    }
+  </style>
 </head>
 
 <body>
 
   <div class="oj-dropdown" data-single>
-    <button class="oj-dropdown-button">🌐 <span>English</span></button>
+    <button class="oj-dropdown-button">
+      🌐
+      <span> English</span>
+      <span class="oj-dropdown-arrow">▾</span>
+    </button>
 
-    <div class="oj-dropdown-content">
+    <div class="oj-dropdown-content" tabindex="-1">
       <button data-selected>English</button>
       <button>Nederlands</button>
       <button>Deutsch</button>
@@ -57,222 +208,646 @@
     </div>
   </div>
 
-  <script>
+<script>
+  "use strict";
 
-    class OJDropdown {
+  /**
+   * @typedef {Object} DropdownOption
+   * @property {HTMLButtonElement} optionElement - The button element for the option
+   * @property {string} label - Display text of the option
+   * @property {string} value - Value of the option
+   * @property {boolean} selected - Whether the option is currently selected
+   * @property {number} index - Index position of the option
+   */
 
-      constructor(rootElement) {
+  class OJDropdown {
 
-        this.rootElement = rootElement;
+    /**
+     * Dropdown component for custom select functionality
+     * @param {HTMLElement} rootElement - Root element of the dropdown
+     */
+    constructor(rootElement) {
 
-        this.cacheDomElements();
-        this.initializeState();
-        this.initializeOptions();
-        this.bindEventListeners();
+      this.rootElement = rootElement;
+      this.isKeyboard = false;
 
-        this.render();
+      this.cacheDomElements();
+      this.initializeState();
+      this.initializeOptions();
+      this.bindEventListeners();
+      this.render();
 
-      }
+    }
 
-      cacheDomElements() {
+    /**
+     * Cache DOM elements for easy access.
+     * Exists to avoid repeatedly querying the DOM.
+     * @returns {void}
+     */
+    cacheDomElements() {
 
-        this.dom = {
-          rootElement    : this.rootElement,
-          toggleButton   : this.rootElement.querySelector('.oj-dropdown-button'),
-          buttonLabel    : this.rootElement.querySelector('.oj-dropdown-button span'),
-          dropdownContent: this.rootElement.querySelector('.oj-dropdown-content'),
+      this.dom = {
+        rootElement           : this.rootElement,
+        toggleButton          : this.rootElement.querySelector('.oj-dropdown-button'),
+        buttonLabel           : this.rootElement.querySelector('.oj-dropdown-button span'),
+        dropdownContent       : this.rootElement.querySelector('.oj-dropdown-content'),
+        dropdownOptionElements: Array.from(this.rootElement.querySelectorAll('.oj-dropdown-content button'))
+      };
 
-          dropdownOptionElements: Array.from(this.rootElement.querySelectorAll('.oj-dropdown-content button'))
-        };
+      this.dom.dropdownContent.id = this.dom.dropdownContent.id || this.generateId();
 
-      }
+      this.dom.toggleButton.setAttribute('aria-haspopup', 'listbox');
+      this.dom.dropdownContent.setAttribute('role', 'listbox');
 
-      initializeState() {
+    }
 
-        this.state = {
-          isOpen             : false,
-          selectedOptionIndex: this.dom.dropdownOptionElements.findIndex(button => button.hasAttribute('data-selected')),
-          focusedOptionIndex : -1
-        };
+    /**
+     * Generate unique ID for accessibility
+     * Exists to provide a unique ID for aria attributes
+     * @param {string} [prefix='oj-dropdown']
+     * @returns {string}
+     */
+    generateId(prefix = 'oj-dropdown') {
+      return `${prefix}-${Math.random().toString(36).slice(2)}`;
+    }
 
-      }
+    /**
+     * Initialize component state.
+     * Exists to track open/closed state and selected/focused options.
+     * @returns {void}
+     */
+    initializeState() {
 
-      initializeOptions() {
+      this.state = {
+        isOpen             : false,
+        selectedOptionIndex: this.dom.dropdownOptionElements.findIndex(button => button.hasAttribute('data-selected')),
+        focusedOptionIndex : -1
+      };
 
-        this.options = this.dom.dropdownOptionElements.map((button, index) => ({
-          optionElement: button,
-          label        : button.textContent,
-          value        : button.dataset.value || button.textContent,
-          selected     : button.hasAttribute('data-selected'),
-          index
-        }));
+    }
 
-      }
+    /**
+     * Initialize dropdown options.
+     * Exists to convert DOM buttons into internal option objects.
+     * @returns {void}
+     */
+    initializeOptions() {
 
-      bindEventListeners() {
+      /** @type {DropdownOption[]} */
+      this.options = this.dom.dropdownOptionElements.map((button, index) => {
+        return this.createOption(button, index);
+      });
 
-        this.dom.toggleButton.addEventListener('click', (event) => this.onToggleButtonClick(event));
-        this.dom.toggleButton.addEventListener('keydown', (event) => this.onToggleButtonKeyDown(event));
+    }
 
-        this.options.forEach((option) => {
-          option.optionElement.addEventListener('click', (event) => this.onDropdownOptionClick(event, option.index));
-          option.optionElement.addEventListener('keydown', (event) => this.onOptionKeyDown(event, option.index));
+    /**
+     * Create a single option object and set attributes
+     * Exists to encapsulate option creation logic.
+     * @param {HTMLButtonElement} button
+     * @param {number} index
+     * @returns {DropdownOption}
+     */
+    createOption(button, index) {
+
+      button.setAttribute('role', 'option');
+
+      return {
+        optionElement: button,
+        label        : button.textContent,
+        value        : button.dataset.value || button.textContent,
+        selected     : button.hasAttribute('data-selected'),
+        index
+      };
+
+    }
+
+    /**
+     * Bind all event listeners.
+     * Exists to separate DOM bindings from initialization.
+     * @returns {void}
+     */
+    bindEventListeners() {
+
+      this.bindToggleButtonEvents();
+      this.bindDropdownContentEvents();
+      this.bindOptionClickEvents();
+      this.bindOutsideClickListener();
+
+    }
+
+    /**
+     * Bind toggle button events.
+     * Exists to encapsulate toggle button behavior.
+     * @returns {void}
+     */
+    bindToggleButtonEvents() {
+
+      this.dom.toggleButton.addEventListener('click', () => {
+        this.onToggleButtonClick();
+      });
+
+      this.dom.toggleButton.addEventListener('keydown', (event) => {
+        this.onToggleButtonKeyDown(event);
+      });
+
+    }
+
+    /**
+     * Bind dropdown content events.
+     * Exists to handle keyboard and mouse interaction inside dropdown.
+     * @returns {void}
+     */
+    bindDropdownContentEvents() {
+
+      this.dom.dropdownContent.addEventListener('keydown', (event) => {
+
+        this.isKeyboard = true;
+        this.onListKeyDown(event);
+
+      });
+
+      this.dom.dropdownContent.addEventListener('mousemove', () => {
+        this.isKeyboard = false;
+      });
+
+    }
+
+    /**
+     * Bind click events on each option.
+     * Exists to handle selection when user clicks an option.
+     * @returns {void}
+     */
+    bindOptionClickEvents() {
+
+      this.options.forEach((option) => {
+
+        option.optionElement.addEventListener('click', (event) => {
+          this.onDropdownOptionClick(event, option.index);
         });
 
-      }
+      });
 
-      onToggleButtonClick(event) {
+    }
 
-        this.state.isOpen ? this.close() : this.open();
-        this.render();
+    /**
+     * Close dropdown when clicking outside.
+     * Exists to maintain dropdown accessibility and UX.
+     * @returns {void}
+     */
+    bindOutsideClickListener() {
 
-      }
+      document.addEventListener('click', (event) => {
 
-      onDropdownOptionClick(event, index) {
+        if (!this.dom.rootElement.contains(event.target) && this.state.isOpen) {
 
-        this.selectOption(index);
+          this.close();
+          this.render();
+
+        }
+
+      });
+
+    }
+
+    /**
+     * Toggle dropdown open/close
+     * Exists to encapsulate toggle button click behavior.
+     * @returns {void}
+     */
+    onToggleButtonClick() {
+
+      if (this.state.isOpen) {
+
         this.close();
         this.render();
-        
-      }
 
-      onToggleButtonKeyDown(event) {
+      } else {
 
-        if (event.key === 'ArrowDown') {
-
-          event.preventDefault();
-
-          this.open();
-          this.state.focusedOptionIndex = this.state.selectedOptionIndex >= 0 ? this.state.selectedOptionIndex : 0;
-
-          this.render();
-          this.focusOption(this.state.focusedOptionIndex);
-
-        }
-
-      }
-
-      focusOption(index) {
-
-        const option = this.options[index];
-
-        if (option) {
-          option.optionElement.focus();
-        }
-
-      }
-
-      onOptionKeyDown(event, index) {
-
-        if (event.key === 'ArrowDown') {
-
-          event.preventDefault();
-
-          const nextIndex = (index + 1) % this.options.length;
-          this.state.focusedOptionIndex = nextIndex;
-
-          this.focusOption(nextIndex);
-
-        }
-
-        if (event.key === 'ArrowUp') {
-
-          event.preventDefault();
-
-          const prevIndex = (index - 1 + this.options.length) % this.options.length;
-          this.state.focusedOptionIndex = prevIndex;
-
-          this.focusOption(prevIndex);
-
-        }
-
-        if (event.key === 'Enter') {
-
-          event.preventDefault();
-
-          this.selectOption(index);
-          this.close();
-          this.render();
-
-          this.dom.toggleButton.focus();
-
-        }
-
-        if (event.key === 'Escape') {
-
-          this.close();
-          this.render();
-
-          this.dom.toggleButton.focus();
-
-        }
-
-      }
-
-      open() {
-
-        if (!this.state.isOpen) {
-          this.state.isOpen = true;
-          this.dom.rootElement.classList.add('open');
-        }
-
-      }
-
-      close() {
-
-        if (this.state.isOpen) {
-          this.state.isOpen = false;
-          this.dom.rootElement.classList.remove('open');
-          this.state.focusedOptionIndex = -1;
-        }
-
-      }
-
-      selectOption(index) {
-
-        const option = this.options[index];
-
-        if (option) {
-
-          this.state.selectedOptionIndex = index;
-
-          this.options.forEach(opt => opt.selected = false);
-          option.selected = true;
-
-        }
-
-      }
-
-      render() {
-
-        if (this.state.isOpen) {
-          this.dom.rootElement.classList.add('open');
-        } else {
-          this.dom.rootElement.classList.remove('open');
-        }
-
-        const selectedOption = this.options[this.state.selectedOptionIndex];
-
-        if (selectedOption) {
-          this.dom.buttonLabel.textContent = selectedOption.label;
-        }
-
-        this.options.forEach(opt => {
-          if (opt.selected) {
-            opt.optionElement.setAttribute('data-selected', '');
-          } else {
-            opt.optionElement.removeAttribute('data-selected');
-          }
-        });
+        this.open();
+        this.state.focusedOptionIndex = -1;
+        this.render();
+        this.dom.dropdownContent.focus();
 
       }
 
     }
 
-    for (const el of document.querySelectorAll(".oj-dropdown"))
-      new OJDropdown(el)
+    /**
+     * Handle toggle button keydown (ArrowDown)
+     * Exists to support keyboard accessibility.
+     * @param {KeyboardEvent} event
+     * @returns {void}
+     */
+    onToggleButtonKeyDown(event) {
 
-  </script>
+      if (event.key === 'ArrowDown') {
+
+        event.preventDefault();
+        this.open();
+
+        if (this.state.selectedOptionIndex >= 0) {
+          this.state.focusedOptionIndex = this.state.selectedOptionIndex;
+        } else {
+          this.state.focusedOptionIndex = 0;
+        }
+
+        this.isKeyboard = true;
+        this.render();
+        this.focusOption(this.state.focusedOptionIndex);
+
+      }
+
+    }
+
+    /**
+     * Handle keydown events inside dropdown list.
+     * Exists to centralize keyboard navigation logic.
+     * @param {KeyboardEvent} event
+     * @returns {void}
+     */
+    onListKeyDown(event) {
+
+      if (event.key === 'ArrowDown') {
+
+        this.handleArrowDown();
+
+      } else if (event.key === 'ArrowUp') {
+
+        this.handleArrowUp();
+
+      } else if (event.key === 'Enter') {
+
+        this.handleEnter();
+
+      } else if (event.key === 'Escape' || event.key === 'Tab') {
+
+        this.handleEscapeOrTab();
+
+      }
+
+    }
+
+    /**
+     * Move focus to next option.
+     * @returns {void}
+     */
+    handleArrowDown() {
+
+      event.preventDefault();
+
+      let nextIndex;
+
+      if (this.state.focusedOptionIndex === -1) {
+
+        if (this.state.selectedOptionIndex >= 0) {
+          nextIndex = this.state.selectedOptionIndex;
+        } else {
+          nextIndex = 0;
+        }
+
+      } else {
+
+        nextIndex = (this.state.focusedOptionIndex + 1) % this.options.length;
+
+      }
+
+      this.state.focusedOptionIndex = nextIndex;
+      this.render();
+      this.focusOption(nextIndex);
+
+    }
+
+    /**
+     * Move focus to previous option.
+     * @returns {void}
+     */
+    handleArrowUp() {
+
+      event.preventDefault();
+
+      let prevIndex;
+
+      if (this.state.focusedOptionIndex === -1) {
+
+        if (this.state.selectedOptionIndex >= 0) {
+          prevIndex = this.state.selectedOptionIndex;
+        } else {
+          prevIndex = 0;
+        }
+
+      } else {
+
+        prevIndex = (this.state.focusedOptionIndex - 1 + this.options.length) % this.options.length;
+
+      }
+
+      this.state.focusedOptionIndex = prevIndex;
+      this.render();
+      this.focusOption(prevIndex);
+
+    }
+
+    /**
+     * Select currently focused option with Enter.
+     * @returns {void}
+     */
+    handleEnter() {
+
+      event.preventDefault();
+
+      if (this.state.focusedOptionIndex !== -1) {
+
+        this.selectOption(this.state.focusedOptionIndex);
+        this.close();
+        this.render();
+        this.dom.toggleButton.focus();
+
+      }
+
+    }
+
+    /**
+     * Close dropdown on Escape or Tab.
+     * @returns {void}
+     */
+    handleEscapeOrTab() {
+
+      this.close();
+      this.render();
+      this.dom.toggleButton.focus();
+
+    }
+
+    /**
+     * Handle option click
+     * @param {MouseEvent} event
+     * @param {number} index
+     * @returns {void}
+     */
+    onDropdownOptionClick(event, index) {
+
+      this.selectOption(index);
+      this.close();
+      this.render();
+
+    }
+
+    /**
+     * Focus a specific option
+     * @param {number} index
+     * @returns {void}
+     */
+    focusOption(index) {
+
+      const option = this.options[index];
+
+      if (option) {
+        option.optionElement.focus();
+      }
+
+    }
+
+    /**
+     * Open dropdown
+     * @returns {void}
+     */
+    open() {
+      this.state.isOpen = true;
+    }
+
+    /**
+     * Close dropdown
+     * @returns {void}
+     */
+    close() {
+      this.state.isOpen = false;
+      this.state.focusedOptionIndex = -1;
+    }
+
+    /**
+     * Select a specific option
+     * @param {number} index
+     * @returns {void}
+     */
+    selectOption(index) {
+
+      const option = this.options[index];
+
+      if (option) {
+
+        this.clearAllSelections();
+        option.selected = true;
+        this.state.selectedOptionIndex = index;
+
+      }
+
+    }
+
+    /**
+     * Clear selection on all options
+     * @returns {void}
+     */
+    clearAllSelections() {
+
+      this.options.forEach(opt => {
+        opt.selected = false;
+      });
+
+    }
+
+    /**
+     * Render dropdown DOM updates
+     * @returns {void}
+     */
+    render() {
+
+      this.dom.rootElement.classList.toggle('open', this.state.isOpen);
+      this.dom.toggleButton.setAttribute('aria-expanded', this.state.isOpen);
+      this.dom.toggleButton.setAttribute('aria-controls', this.dom.dropdownContent.id);
+
+      this.updateSelectedOptionDOM();
+      this.updateKeyboardFocusDOM();
+
+    }
+
+    /**
+     * Update the selected option label and highlight
+     * @returns {void}
+     */
+    updateSelectedOptionDOM() {
+
+      const selectedOption = this.options[this.state.selectedOptionIndex];
+
+      if (selectedOption) {
+        this.dom.buttonLabel.textContent = selectedOption.label;
+      }
+
+      this.options.forEach(opt => {
+
+        if (opt.selected) {
+          opt.optionElement.setAttribute('data-selected', '');
+        } else {
+          opt.optionElement.removeAttribute('data-selected');
+        }
+
+        opt.optionElement.setAttribute('aria-selected', opt.selected);
+
+      });
+
+    }
+
+    /**
+     * Update keyboard-focused option highlighting
+     * @returns {void}
+     */
+    updateKeyboardFocusDOM() {
+
+      this.options.forEach((opt, index) => {
+
+        if (this.state.isOpen && index === this.state.focusedOptionIndex && this.isKeyboard) {
+          opt.optionElement.classList.add('oj-keyboard-focused');
+        } else {
+          opt.optionElement.classList.remove('oj-keyboard-focused');
+        }
+
+      });
+
+    }
+
+  }
+
+  for (const el of document.querySelectorAll(".oj-dropdown")) {
+    new OJDropdown(el);
+  }
+
+  /* ===== Tests - seeable in console ===== */
+  (function runTests(){
+    console.group("OJDropdown Tests");
+
+    const root = document.createElement('div');
+    root.innerHTML = `
+      <div class="oj-dropdown" data-single>
+        <button class="oj-dropdown-button">🌐<span> English</span><span class="oj-dropdown-arrow">▾</span></button>
+        <div class="oj-dropdown-content" tabindex="-1">
+          <button data-selected>English</button>
+          <button>Nederlands</button>
+          <button>Deutsch</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(root);
+    const dd = root.querySelector('.oj-dropdown');
+    const dropdown = new OJDropdown(dd);
+
+    function logAssert(condition, message) {
+      if (!condition) {
+        console.error("%c" + message, "color: red; font-weight: bold;");
+      } else {
+        console.log("%c" + message, "color: green; font-weight: bold;");
+      }
+    }
+
+    /**
+     * Utility function to simulate KeyboardEvent
+     * @param {HTMLElement} element
+     * @param {string} key
+     */
+    function simulateKey(element, key){
+      const event = new KeyboardEvent('keydown', { key });
+      element.dispatchEvent(event);
+    }
+
+    console.group("Initial State Tests");
+
+      logAssert(dropdown.state.isOpen === false, "Initial isOpen should be false");
+      logAssert(dropdown.state.selectedOptionIndex === 0, "Initial selected index should be 0");
+      logAssert(dropdown.state.focusedOptionIndex === -1, "Initial focused index should be -1");
+
+    console.groupEnd();
+
+    console.group("Options Selection Tests");
+
+      dropdown.selectOption(2);
+      logAssert(dropdown.state.selectedOptionIndex === 2, "selectOption sets selectedOptionIndex");
+      logAssert(dropdown.options[2].selected === true, "selectOption marks option as selected");
+      logAssert(dropdown.options[0].selected === false, "selectOption clears other selections");
+
+      dropdown.clearAllSelections();
+      logAssert(dropdown.options.every(o => o.selected === false), "clearAllSelections clears all");
+
+    console.groupEnd();
+
+    console.group("Open/Close Tests");
+
+      dropdown.open();
+      logAssert(dropdown.state.isOpen === true, "open() sets isOpen true");
+      dropdown.close();
+      logAssert(dropdown.state.isOpen === false, "close() sets isOpen false");
+      logAssert(dropdown.state.focusedOptionIndex === -1, "close() resets focusedOptionIndex");
+
+    console.groupEnd();
+
+    console.group("Toggle Button Click Tests");
+
+      dropdown.onToggleButtonClick();
+      logAssert(dropdown.state.isOpen === true, "onToggleButtonClick opens dropdown");
+      dropdown.onToggleButtonClick();
+      logAssert(dropdown.state.isOpen === false, "onToggleButtonClick closes dropdown");
+
+      console.groupEnd();
+
+    console.group("Keyboard Tests");
+
+      dropdown.open();
+
+      // ArrowDown
+      dropdown.state.focusedOptionIndex = -1;
+      simulateKey(dropdown.dom.dropdownContent, 'ArrowDown');
+      logAssert(dropdown.state.focusedOptionIndex === dropdown.state.selectedOptionIndex, "ArrowDown focuses selected option if none focused");
+
+      // ArrowUp
+      dropdown.state.focusedOptionIndex = 1;
+      simulateKey(dropdown.dom.dropdownContent, 'ArrowUp');
+      logAssert(dropdown.state.focusedOptionIndex === 0, "ArrowUp moves focus to previous option");
+
+      // Enter selects focused option
+      dropdown.state.focusedOptionIndex = 1;
+      simulateKey(dropdown.dom.dropdownContent, 'Enter');
+      logAssert(dropdown.state.selectedOptionIndex === 1, "Enter selects the focused option");
+      logAssert(dropdown.state.isOpen === false, "Enter closes dropdown after selection");
+
+      // Escape closes dropdown
+      dropdown.open();
+      simulateKey(dropdown.dom.dropdownContent, 'Escape');
+      logAssert(dropdown.state.isOpen === false, "Escape closes dropdown");
+
+      // Tab closes dropdown
+      dropdown.open();
+      simulateKey(dropdown.dom.dropdownContent, 'Tab');
+      logAssert(dropdown.state.isOpen === false, "Tab closes dropdown");
+
+    console.groupEnd();
+
+    console.group("DOM Update Tests");
+
+      dropdown.selectOption(0);
+      dropdown.render();
+      logAssert(dropdown.dom.buttonLabel.textContent === 'English', "render updates button label correctly");
+      logAssert(dropdown.options[0].optionElement.hasAttribute('data-selected'), "render sets data-selected attribute");
+      logAssert(!dropdown.options[1].optionElement.hasAttribute('data-selected'), "render removes data-selected from unselected");
+      console.groupEnd();
+
+      console.group("Focus Selectbox element Tests");
+      dropdown.focusOption(1);
+      logAssert(document.activeElement === dropdown.options[1].optionElement, "focusOption sets DOM focus correctly");
+
+    console.groupEnd();
+
+    document.body.removeChild(root);
+    console.groupEnd();
+  })();
+
+</script>
 
 </body>
 
